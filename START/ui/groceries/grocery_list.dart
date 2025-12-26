@@ -1,4 +1,3 @@
-import 'package:firstproject/Start_Code3/ui/groceries/grocery_list.dart';
 import 'package:flutter/material.dart';
 import '../../data/mock_grocery_repository.dart';
 import '../../models/grocery.dart';
@@ -38,6 +37,7 @@ class _GroceryListState extends State<GroceryList> {
         index: _currentTabIndex,
         children: [GroceriesTab(), SearchTab()],
       ),
+
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Theme.of(context).colorScheme.primary,
         currentIndex: _currentTabIndex,
@@ -58,6 +58,32 @@ class _GroceryListState extends State<GroceryList> {
   }
 }
 
+class GroceriesTab extends StatelessWidget {
+  const GroceriesTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget content = const Center(child: Text('No items added yet.'));
+
+    if (dummyGroceryItems.isNotEmpty) {
+      //  Display groceries with an Item builder and  LIst Tile
+      content = ListView.builder(
+        itemCount: dummyGroceryItems.length,
+        itemBuilder: (context, index) =>
+            GroceryTile(grocery: dummyGroceryItems[index]),
+      );
+    }
+    return content;
+  }
+}
+
+class SearchTab extends StatefulWidget {
+  const SearchTab({super.key});
+
+  @override
+  State<SearchTab> createState() => _SearchTabState();
+}
+
 class _SearchTabState extends State<SearchTab> {
   String searchKey = "";
 
@@ -76,7 +102,7 @@ class _SearchTabState extends State<SearchTab> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsGeometry.all(1.5),
+      padding: const EdgeInsets.all(15.0),
       child: Column(
         children: [
           TextField(onChanged: onSearchChange),
