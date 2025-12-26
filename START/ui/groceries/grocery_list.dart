@@ -1,3 +1,4 @@
+import 'package:firstproject/Start_Code3/ui/groceries/grocery_list.dart';
 import 'package:flutter/material.dart';
 import '../../data/mock_grocery_repository.dart';
 import '../../models/grocery.dart';
@@ -11,6 +12,7 @@ class GroceryList extends StatefulWidget {
 }
 
 class _GroceryListState extends State<GroceryList> {
+  int _currentTabIndex = 0;
 
   void onCreate() async {
     // Navigate to the form screen using the Navigator push
@@ -27,23 +29,67 @@ class _GroceryListState extends State<GroceryList> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = const Center(child: Text('No items added yet.'));
-
-    if (dummyGroceryItems.isNotEmpty) {
-      //  Display groceries with an Item builder and  LIst Tile
-      content = ListView.builder(
-        itemCount: dummyGroceryItems.length,
-        itemBuilder: (context, index) =>
-            GroceryTile(grocery: dummyGroceryItems[index]),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Groceries'),
         actions: [IconButton(onPressed: onCreate, icon: const Icon(Icons.add))],
       ),
-      body: content,
+      body: IndexedStack(
+        index: _currentTabIndex,
+        children: [GroceriesTab(), SearchTab()],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        currentIndex: _currentTabIndex,
+        onTap: (index) {
+          setState(() {
+            _currentTabIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_grocery_store),
+            label: 'Groceries',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+        ],
+      ),
+    );
+  }
+}
+
+class _SearchTabState extends State<SearchTab> {
+  String searchKey = "";
+
+  List<Grocery> get filteredItems {
+    return dummyGroceryItems
+        .where((element) => element.name.startsWith(searchKey))
+        .toList(); // filtrer
+  }
+
+  void onSearchChange(String value) {
+    setState(() {
+      searchKey = value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsetsGeometry.all(1.5),
+      child: Column(
+        children: [
+          TextField(onChanged: onSearchChange),
+          SizedBox(height: 10),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredItems.length,
+              itemBuilder: (context, index) =>
+                  GroceryTile(grocery: filteredItems[index]),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
